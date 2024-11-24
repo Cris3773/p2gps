@@ -2,14 +2,26 @@ version: "3"
 services:  # ahora se indican los servicios por el orden en que se quiere que se inicien.
 #Por ejemplo, mongo debe estar antes de order.
 #mongo: mismo nombre usado en el run.sh de Order y application.properties. #Se resuelve en una dirección IP.
+  web:
+    image: crisstinaa/p2gps:web
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.25"
+          #memory: 300M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "80:8080"
   mongo:
-    image: Cris3773/p2gps:db
+    image: crisstinaa/p2gps:db
     deploy:
       replicas: 1 # para escabilidad del servicio.
       resources:
         limits:
           cpus: "0.15"
-          memory: 200M
+          #memory: 200M
       restart_policy:
         condition: on-failure #reinicar el contenedor si falla
     ports:
@@ -18,7 +30,7 @@ services:  # ahora se indican los servicios por el orden en que se quiere que se
     volumes:
       - "db-data:/data/db" # para guardar en local los cambios en el contenedor
   order:
-    image: Cris3773/p2gps:order
+    image: crisstinaa/p2gps:order
     depends_on:
       - "mongo" #le pasamos al servicio order la IP del servicio mongo
     deploy:
@@ -26,22 +38,11 @@ services:  # ahora se indican los servicios por el orden en que se quiere que se
       resources:
         limits:
           cpus: "0.3"
-          memory: 500M
+          #memory: 500M
       restart_policy:
         condition: on-failure
     ports:
       - "8080:8080"
-  web:
-    image: Cris3773/p2gps:web
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: "0.25"
-          memory: 300M
-      restart_policy:
-        condition: on-failure
-    ports:
-      - "80:8080"
+
 volumes:
   db-data:
